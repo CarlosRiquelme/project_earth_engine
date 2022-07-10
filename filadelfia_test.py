@@ -32,6 +32,32 @@ imageVisParam3 = {"opacity":1,"bands":["B4","B5","B6"],"min":7167.28,"max":15820
 # cambios = geometry3,
 # no_bosque =geometry;
 
+imageCollection = ee.ImageCollection("LANDSAT/LC08/C01/T1_RT"),
+geometry = ee.Geometry.MultiPoint();
+    
+dataset = ee.ImageCollection('LANDSAT/LC08/C01/T1_RT')\
+                  .filter(ee.Filter.date('2016-06-01', '2016-10-31')).filterBounds(filadelfia).filter(ee.Filter.lte('CLOUD_COVER',5));
+ndvi = dataset.select("B[2-9]*");
+
+ndviVis = {
+  'min': 0.0,
+  'max': 8000.0,
+  'palette': [
+    'FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718', '74A901',
+    '66A000', '529400', '3E8601', '207401', '056201', '004C00', '023B01',
+    '012E01', '011D01', '011301'
+  ]};
+  
+visParam={
+    'bands': ['B4','B3','B2'],
+    'min': 211.2,
+    'max':1196.8,
+    'gamma':1.6
+}
+
+Map.addLayer(ndvi.mean(), imageVisParam, 'EVI');
+
+
 limite = filadelfia
 Map.addLayer(limite, imageVisParam,'Limite')
 Map.setCenter(-61.182, -21.96)
@@ -41,18 +67,14 @@ point_bosque_1=ee.Geometry.Point([-60.371259413088225,-20.602807874701703])
 # poly1 = ee.Geometry.Point([-50, 30]).buffer(1e6)
 # print(poly1)
 # Mapdisplay(center= (30,-45),dicc={'point':point_bosque_1},zoom_start=3)
-dataset_2016 = ee.ImageCollection(imageCollection2).filterDate('2016-06-01','2016-10-31').filterBounds(filadelfia).filter(ee.Filter.lte('CLOUD_COVER',10));#filtra lo que tiene 10% de nubosidad
+dataset_2016 = ee.ImageCollection(imageCollection2).filterDate('2016-06-01','2016-10-31').filterBounds(filadelfia);
+#filter(ee.Filter.lte('CLOUD_COVER',10));#filtra lo que tiene 10% de nubosidad
 dataset_2015 = ee.ImageCollection(imageCollection2).filterDate('2015-06-01','2015-08-30').filterBounds(filadelfia).filter(ee.Filter.lte('CLOUD_COVER',5)); #filtra lo que tiene 5% de nubosidad
 composite_2016 = dataset_2016.map(cloudMaskL457).median().clip(filadelfia).select("B[2-9]*")
 composite_2015 = dataset_2015.map(cloudMaskL457).median().clip(filadelfia).select("B[2-9]*")
 
 
-visParam={
-    'bands': ['B4','B3','B2'],
-    'min': 211.2,
-    'max':1196.8,
-    'gamma':1.6
-}
+
 
 Map.addLayer(composite_2016, imageVisParam2 , 'Mosaico_2016');
 Map.addLayer(composite_2015, imageVisParam3 , 'Mosaico_2015');
@@ -61,4 +83,3 @@ Map.addLayer(composite_2015, imageVisParam3 , 'Mosaico_2015');
 
 #print(dataset_2016)
 print('fin')
-
