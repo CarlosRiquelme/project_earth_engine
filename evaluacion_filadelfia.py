@@ -43,8 +43,10 @@ point_bosque_1=ee.Geometry.Point([-60.371259413088225,-20.602807874701703])
 # Mapdisplay(center= (30,-45),dicc={'point':point_bosque_1},zoom_start=3)
 dataset_2016 = ee.ImageCollection(imageCollection2).filterDate('2016-06-01','2016-10-31').filterBounds(filadelfia).filter(ee.Filter.lte('CLOUD_COVER',10));#filtra lo que tiene 10% de nubosidad
 dataset_2015 = ee.ImageCollection(imageCollection2).filterDate('2015-06-01','2015-08-30').filterBounds(filadelfia).filter(ee.Filter.lte('CLOUD_COVER',5)); #filtra lo que tiene 5% de nubosidad
-composite_2016 = dataset_2016.map(cloudMaskL457).median().clip(filadelfia).select("B[2-9]*")
-composite_2015 = dataset_2015.map(cloudMaskL457).median().clip(filadelfia).select("B[2-9]*")
+composite_2016 = dataset_2016.median().clip(filadelfia).select("B[2-9]*")
+composite_2015 = dataset_2015.median().clip(filadelfia).select("B[2-9]*")
+
+#map(cloudMaskL457)
 
 
 visParam={
@@ -57,6 +59,12 @@ visParam={
 Map.addLayer(composite_2016, imageVisParam2 , 'Mosaico_2016');
 Map.addLayer(composite_2015, imageVisParam3 , 'Mosaico_2015');
 
+mosaicmf= composite_2016.addBands(composite_2015);
+Map.addLayer(mosaicmf, imageVisParam , 'Mosaico_15-16');
+
+##normalizacion 
+
+#clasificacion supervisada
 
 
 #print(dataset_2016)
